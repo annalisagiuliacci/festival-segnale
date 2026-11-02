@@ -3,12 +3,12 @@
 
 /* Scelte comuni: ogni regola usa var() per richiamarne il valore. */
 :root {
-  --colore-primario: #245c49;
-  --colore-primario-scuro: #173f32;
+  --colore-primario: #d25b00;
+  --colore-primario-scuro: #753104;
   --colore-sfondo: #f5f2e9;
   --colore-testo: #202923;
-  --font-testo: Arial, Helvetica, sans-serif;
-  --font-titoli: Georgia, "Times New Roman", serif;
+   --font-testo: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-titoli: Cambria, Cochin, Georgia, "Times New Roman", serif;
 }
 
 * {
@@ -79,7 +79,7 @@ nav a[aria-current="page"] {
 }
 
 .intro {
-  padding: 3rem 0 1rem;
+  padding: 4rem 0 1rem;
 }
 
 .eyebrow,
@@ -202,7 +202,7 @@ h3 {
 }
 
 .site-footer {
-  padding: 1.25rem 0;
+  padding: 1rem 0;
   border-top: 1px solid #b7c0b7;
   color: #46564b;
   font-size: 0.875rem;
