@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Info e luoghi — Segnale</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/14.4.0/swiper-bundle.min.css">
+
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/14.4.0/swiper-bundle.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    if (typeof Swiper === "undefined") {
+      console.error("Swiper non è stato caricato.");
+      return;
+    }
+
+    new Swiper(".venue-swiper", {
+      slidesPerView: 1,
+      navigation: {
+        prevEl: ".venue-prev",
+        nextEl: ".venue-next"
+      }
+    });
+  });
+</script>
+
+<body>
+  <a class="skip-link" href="#contenuto">Vai al contenuto</a>
+
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html">Segnale<span>Festival di design</span></a>
+      <nav aria-label="Navigazione principale">
+        <a href="index.html">Home</a>
+        <a href="programma.html">Programma</a>
+        <a href="info.html" aria-current="page">Info e luoghi</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenuto" class="container">
+    <section class="intro" aria-labelledby="titolo-info">
+      <p class="eyebrow">12–13 giugno · Torino · Festival immaginario</p>
+      <h1 id="titolo-info">Info e luoghi</h1>
+      <p class="lead">Tre spazi, due giorni e tante occasioni per incontrarsi.</p>
+      <p class="reading-text">Segnale si svolge in tre luoghi immaginari della città. Qui trovi le informazioni essenziali sulle sedi e su come orientarti tra gli appuntamenti.</p>
+    </section>
+
+    <section class="content-section" aria-labelledby="titolo-luoghi">
+  <p class="eyebrow">Scopri le sedi</p>
+  <h2 id="titolo-luoghi">Spazi diversi, idee che si incontrano</h2>
+
+  <div class="swiper venue-swiper" aria-label="Fotografie delle sedi del festival">
+    <div class="swiper-wrapper">
+      <figure class="swiper-slide">
+        <img
+          src="assets/luoghi/mirafiori.jpg"
+          alt="Fotografia della sede di Mirafiori"
+          width="1200"
+          height="800"
+        >
+        <figcaption>
+          <h3>Mirafiori</h3>
+          <p>Design e Automotive Engineering.</p>
+        </figcaption>
+      </figure>
+
+      <figure class="swiper-slide">
+        <img
+          src="assets/luoghi/politecnico-valentino.jpg"
+          alt="Fotografia della sede del Valentino"
+          width="1200"
+          height="800"
+        >
+        <figcaption>
+          <h3>Valentino</h3>
+          <p>Architettura.</p>
+        </figcaption>
+      </figure>
+
+      <figure class="swiper-slide">
+        <img
+          src="assets/luoghi/sede-centrale.jpg"
+          alt="Fotografia della sede centrale"
+          width="1200"
+          height="800"
+        >
+        <figcaption>
+          <h3>Sede Centrale</h3>
+          <p>Ingegneria.</p>
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="venue-controls">
+      <button class="venue-prev" type="button" aria-label="Mostra la sede precedente">
+        Precedente
+      </button>
+      <button class="venue-next" type="button" aria-label="Mostra la sede successiva">
+        Successiva
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="content-section" aria-labelledby="titolo-mappa">
+  <p class="eyebrow">Torino</p>
+  <h2 id="titolo-mappa">Mappa e indirizzi</h2>
+
+  <div class="map-embed">
+    <iframe
+      id="mappa-sedi"
+      title="Mappa delle tre sedi di riferimento per il festival Segnale a Torino"
+      src="https://umap.openstreetmap.fr/it/map/segnale-sedi-del-festival-immaginario_1479665?scaleControl=false&amp;miniMapControl=false&amp;scrollWheelZoom=false&amp;zoomControl=true&amp;editMode=disabled&amp;moreControl=true&amp;searchControl=null&amp;tilelayersControl=null&amp;embedControl=null&amp;datalayersControl=true&amp;onLoadPanel=none&amp;captionBar=false&amp;captionMenus=true#12/45.046500/7.652800"
+      loading="lazy"
+      allowfullscreen>
+    </iframe>
+  </div>
+
+  <p>
+  <a
+    href="https://umap.openstreetmap.fr/it/map/segnale-sedi-del-festival-immaginario_1479665?scaleControl=false&amp;miniMapControl=false&amp;scrollWheelZoom=false&amp;zoomControl=true&amp;editMode=disabled&amp;moreControl=true&amp;searchControl=null&amp;tilelayersControl=null&amp;embedControl=null&amp;datalayersControl=true&amp;onLoadPanel=none&amp;captionBar=false&amp;captionMenus=true#12/45.046500/7.652800"
+    target="_blank"
+    rel="noopener noreferrer">
+    Visualizza la mappa a schermo intero
+  </a>
+</p>
+
+
+  <ul class="venues">
+    <li>
+      <strong>Sede centrale:</strong> Corso Duca degli Abruzzi 24, Torino.
+      <a href="https://www.google.com/maps/dir/?api=1&amp;destination=Corso+Duca+degli+Abruzzi+24%2C+Torino">
+        Indicazioni stradali
+      </a>
+    </li>
+    <li>
+      <strong>Politecnico al Valentino:</strong> Viale Mattioli 39, Torino.
+      <a href="https://www.google.com/maps/dir/?api=1&amp;destination=Viale+Mattioli+39%2C+Torino">
+        Indicazioni stradali
+      </a>
+    </li>
+    <li>
+      <strong>Sede di Mirafiori:</strong> Corso Luigi Settembrini 178, Torino.
+      <a href="https://www.google.com/maps/dir/?api=1&amp;destination=Corso+Luigi+Settembrini+178%2C+Torino">
+        Indicazioni stradali
+      </a>
+    </li>
+  </ul>
+</section>
+
+
+    <section class="content-section" aria-labelledby="titolo-organizzazione">
+      <p class="eyebrow">Prima di partire</p>
+      <h2 id="titolo-organizzazione">Informazioni utili</h2>
+      <ul class="venues">
+        <li><strong>Quando:</strong> venerdì 12 e sabato 13 giugno.</li>
+        <li><strong>Dove:</strong> Torino, nelle tre sedi indicate in questa pagina e nel Programma.</li>
+        <li><strong>Orari e attività:</strong> consulta la pagina <a href="programma.html">Programma</a> per i dettagli dei singoli appuntamenti.</li>
+      </ul>
+      <p class="reading-text">Festival, sedi ed eventi sono inventati per questa esercitazione. Non rappresentano un evento reale.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Segnale · Progetto didattico · Festival immaginario</p>
+    </div>
+  </footer>
+</body>
+</html>
