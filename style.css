@@ -3,12 +3,13 @@
 
 /* Scelte comuni: ogni regola usa var() per richiamarne il valore. */
 :root {
-  --colore-primario: #d25b00;
-  --colore-primario-scuro: #753104;
-  --colore-sfondo: #f5f2e9;
-  --colore-testo: #202923;
-   --font-testo: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-titoli: Cambria, Cochin, Georgia, "Times New Roman", serif;
+  --colore-primario: #000000;
+  --colore-primario-scuro: #ffffff;
+  --colore-sfondo: #ffffff;
+  --colore-testo: #000000;
+  --font-testo: "Public Sans", sans-serif;
+  --font-titoli: "Public Sans", sans-serif;
+
 }
 
 * {
@@ -21,7 +22,7 @@ body {
   color: var(--colore-testo);
   font-family: var(--font-testo);
   font-size: 1rem;
-  line-height: 1.6;
+  line-height: 1.1;
 }
 
 a {
@@ -66,32 +67,52 @@ a:focus-visible {
 .brand {
   display: inline-block;
   color: var(--colore-testo);
-  font-size: 1.75rem;
+  font-size: 5.0rem;
   font-weight: bold;
-  line-height: 1.2;
+  line-height: 1;
   text-decoration: none;
 }
 
 .brand span {
   display: block;
-  margin-top: 0.25rem;
+  margin-top: clamp(0.1rem, 0.5vw, 0.2rem);
   font-size: 0.875rem;
+  line-height: 1.2;
   font-weight: normal;
+}
+
+@media (max-width: 400px) {
+  .brand {
+    font-size: clamp(2.5rem, calc(92vw / 4.2), 5rem);
+  }
 }
 
 nav {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 0.25rem;
+  align-items: stretch;
+  gap: 0.5rem;
   margin-top: 1rem;
 }
 
 nav a {
   display: block;
-  margin: 0;
-  padding: 0.25rem 0;
+  box-sizing: border-box;
+  width: min(10rem, 100%);
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  background: var(--colore-primario);
+  color: #ffffff;
+  text-align: center;
+  text-decoration: none;
 }
+
+nav a:hover {
+  background: var(--colore-primario-scuro);
+  color: #000000;
+  outline: 2px solid var(--colore-primario);
+}
+
 
 @media (min-width: 600px) {
   nav {
@@ -112,7 +133,7 @@ nav a[aria-current="page"] {
 
 .eyebrow,
 .event-meta {
-  color: #46564b;
+  color: #000000;
   font-size: 0.875rem;
   font-weight: bold;
 }
@@ -121,13 +142,17 @@ h1,
 h2,
 h3 {
   font-family: var(--font-titoli);
-  line-height: 1.2;
+  line-height: 1.1;
 }
 
 h1 {
   max-width: 18ch;
   margin: 0.75rem 0 1.25rem;
-  font-size: 2.5rem;
+  font-size: clamp(3.0rem, calc(92vw / 8.4), 3.0rem);
+}
+
+.intro h1 {
+  margin-bottom: 0.3rem;
 }
 
 h2 {
@@ -141,7 +166,21 @@ h3 {
 
 .lead {
   max-width: 48ch;
-  font-size: 1.25rem;
+  font-size: 1rem;
+  font-style: italic;
+}
+
+
+.intro .lead {
+  margin-top: 0;
+}
+
+.intro .lead {
+  margin-bottom: 3.5rem;
+}
+
+.intro .lead + .reading-text {
+  margin-top: 0;
 }
 
 .reading-text {
@@ -149,18 +188,25 @@ h3 {
 }
 
 .button-link {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: min(12rem, 100%);
   margin-top: 1rem;
-  padding: 0.75rem 1.25rem;
-  border-radius: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
   background: var(--colore-primario);
   color: #ffffff;
   font-weight: bold;
+  text-align: center;
   text-decoration: none;
+  line-height: 1.1;
 }
 
 .button-link:hover {
   background: var(--colore-primario-scuro);
+  color: #000000;
+  outline: 2px solid var(--colore-primario);
 }
 
 .content-section {
@@ -173,7 +219,7 @@ h3 {
   max-width: 54rem;
   height: auto;
   margin-top: 1.5rem;
-  border-radius: 0.75rem;
+  border-radius: 0.rem;
 }
 
 .venues {
@@ -206,7 +252,7 @@ h3 {
   min-width: 0;
   overflow: hidden;
   border: 1px solid #b7c0b7;
-  border-radius: 0.75rem;
+  border-radius: 0.rem;
   background: #ffffff;
 }
 
@@ -225,7 +271,7 @@ h3 {
 }
 
 .event-place {
-  color: #46564b;
+  color: #000000;
   font-size: 0.875rem;
 }
 
@@ -264,12 +310,31 @@ h3 {
 }
 
 .venue-swiper figcaption {
-  padding: 1rem 0;
+  padding: rem 0;
 }
 
 .venue-controls {
   display: flex;
   gap: 0.75rem;
+}
+
+.venue-controls button {
+  flex: 1;
+  min-width: 0;
+  padding: 0.6rem 1rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--colore-primario);
+  color: #ffffff;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.venue-controls button:hover {
+  background: var(--colore-primario-scuro);
+  color: #000000;
+  outline: 2px solid var(--colore-primario);
 }
 
 .map-embed {
@@ -283,5 +348,21 @@ h3 {
   border: 0;
 }
 
+@media (max-width: 270px) {
+  nav a,
+  .button-link,
+  .venue-controls button {
+    width: 100%;
+    padding: 0.6em 0.75em;
+    font-size: clamp(0.6rem, 6vw, 0.875rem);
+    white-space: nowrap;
+    border-radius: 999px;
+  }
+}
 
+.site-header nav a[aria-current="page"] {
+  background: var(--colore-primario-scuro);
+  color: #000000;
+  outline: 2px solid var(--colore-primario);
+}
 /* Qui aggiungeremo la media query durante la demo. */
