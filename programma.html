@@ -10,6 +10,7 @@
 
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <a class="skip-link" href="#contenuto">Vai al contenuto</a>
   <header class="site-header">
@@ -33,67 +34,9 @@
 
     <section class="content-section" aria-labelledby="titolo-eventi">
       <h2 id="titolo-eventi">Gli appuntamenti</h2>
-      <div class="event-grid">
-        <article class="event-card">
-          <img src="assets/lettere in movimento.webp" alt="fondo nero e tipografia bold sfocata" width="900" height="600">
-          <div class="event-body">
-            <p class="event-meta">Venerdì 12 giugno · 10:00 · Incontro</p>
-            <h3>Lettere in movimento</h3>
-            <p>Come cambia un messaggio quando cambiano le lettere? Un incontro su tipografia, ritmo e comunicazione visiva.</p>
-            <p class="event-place"><strong>Sede:</strong> Officina Nord</p>
-          </div>
-        </article>
-
-        <article class="event-card">
-          <img src="assets/materia seconda.webp" alt="una persona in un laboratorio che aggiusta un oggetto" width="900" height="600">
-          <div class="event-body">
-            <p class="event-meta">Venerdì 12 giugno · 14:00 · Laboratorio</p>
-            <h3>Materia seconda</h3>
-            <p>Un laboratorio per osservare materiali di recupero e immaginare nuovi utilizzi attraverso piccoli esperimenti.</p>
-            <p class="event-place"><strong>Sede:</strong> Spazio Forma</p>
-          </div>
-        </article>
-
-        <article class="event-card">
-          <img src="assets/la città in un manifesto.webp" alt="manifesti visti dall'alto in diagonale" width="900" height="600">
-          <div class="event-body">
-            <p class="event-meta">Venerdì 12 giugno · 17:00 · Mostra</p>
-            <h3>La città in un manifesto</h3>
-            <p>Una raccolta di manifesti immaginari racconta quartieri, incontri e abitudini della città attraverso forme e colori.</p>
-            <p class="event-place"><strong>Sede:</strong> Cortile Comune</p>
-          </div>
-        </article>
-
-        <article class="event-card">
-          <img src="assets/oggetti in dialogo.webp" alt="gruppi di persone in una stanza che parlano" width="900" height="600">
-          <div class="event-body">
-            <p class="event-meta">Sabato 13 giugno · 10:00 · Incontro</p>
-            <h3>Oggetti in dialogo</h3>
-            <p>Designer e artigiani discutono come nascono gli oggetti quotidiani, tra funzione, cura dei dettagli e possibilità di riparazione.</p>
-            <p class="event-place"><strong>Sede:</strong> Officina Nord</p>
-          </div>
-        </article>
-
-        <article class="event-card">
-          <img src="assets/mappe da abitare_1.jpg" alt="una mappa in colore beige e nero vista dall'alto" width="900" height="600">
-          <div class="event-body">
-            <p class="event-meta">Sabato 13 giugno · 14:00 · Laboratorio</p>
-            <h3>Mappe da abitare</h3>
-            <p>Disegniamo una mappa fatta di percorsi, punti di incontro e luoghi da riscoprire, partendo dall'esperienza di chi li attraversa.</p>
-            <p class="event-place"><strong>Sede:</strong> Spazio Forma</p>
-          </div>
-        </article>
-
-        <article class="event-card">
-          <img src="assets/progettare insieme.jpg" alt="Fotografia di un muro tappezzato di fogli di carta" width="900" height="600">
-          <div class="event-body">
-            <p class="event-meta">Sabato 13 giugno · 17:00 · Mostra</p>
-            <h3>Progettare insieme</h3>
-            <p>Una selezione di progetti collettivi mostra come idee diverse possano diventare un risultato condiviso.</p>
-            <p class="event-place"><strong>Sede:</strong> Cortile Comune</p>
-          </div>
-        </article>
-      </div>
+      <p id="eventi-stato" role="status" aria-live="polite">Caricamento degli eventi…</p>
+      <div class="event-grid" id="event-grid"></div>
+        
     </section>
   </main>
 
@@ -102,5 +45,107 @@
       <p>Segnale · Progetto didattico · Festival immaginario</p>
     </div>
   </footer>
+  <script>
+    const stato = document.getElementById("eventi-stato");
+    const griglia = document.getElementById("event-grid");
+
+    function formattaData(dataISO) {
+      const [anno, mese, giorno] = dataISO.split("-").map(Number);
+      const data = new Date(anno, mese - 1, giorno);
+      const testo = new Intl.DateTimeFormat("it-IT", {
+        weekday: "long",
+        day: "numeric",
+        month: "long"
+      }).format(data);
+
+      return testo.charAt(0).toUpperCase() + testo.slice(1);
+    }
+
+    function creaScheda(evento, sediPerId) {
+      const articolo = document.createElement("article");
+      articolo.className = "event-card";
+
+      const immagine = document.createElement("img");
+      immagine.src = evento.immagine;
+      immagine.alt = evento.immagine_alt;
+      immagine.width = 900;
+      immagine.height = 600;
+      articolo.appendChild(immagine);
+
+      const corpo = document.createElement("div");
+      corpo.className = "event-body";
+
+      const meta = document.createElement("p");
+      meta.className = "event-meta";
+      meta.textContent =
+        `${formattaData(evento.data)} · ${evento.orario} · ${evento.categoria}`;
+
+      const titolo = document.createElement("h3");
+      titolo.textContent = evento.titolo;
+
+      const descrizione = document.createElement("p");
+      descrizione.textContent = evento.descrizione;
+
+      const rigaSede = document.createElement("p");
+      rigaSede.className = "event-place";
+
+      const etichettaSede = document.createElement("strong");
+      etichettaSede.textContent = "Sede: ";
+
+      const sede = sediPerId.get(evento.sede_id);
+      const nomeSede = document.createTextNode(
+        sede ? sede.nome : "Sede da definire"
+      );
+
+      rigaSede.append(etichettaSede, nomeSede);
+      corpo.append(meta, titolo, descrizione, rigaSede);
+      articolo.appendChild(corpo);
+
+      return articolo;
+    }
+
+    async function caricaEventi() {
+      try {
+        const [rispostaEventi, rispostaSedi] = await Promise.all([
+          fetch("eventi.json"),
+          fetch("sedi.json")
+        ]);
+
+        if (!rispostaEventi.ok || !rispostaSedi.ok) {
+          throw new Error("Non è stato possibile leggere uno o più file JSON.");
+        }
+
+        const [eventi, sedi] = await Promise.all([
+          rispostaEventi.json(),
+          rispostaSedi.json()
+        ]);
+
+        if (!Array.isArray(eventi) || !Array.isArray(sedi)) {
+          throw new Error("Il formato dei file JSON non è valido.");
+        }
+
+        if (eventi.length === 0) {
+          stato.textContent = "Non ci sono eventi da mostrare.";
+          return;
+        }
+
+        const sediPerId = new Map(sedi.map((sede) => [sede.id, sede]));
+        const schede = document.createDocumentFragment();
+
+        eventi.forEach((evento) => {
+          schede.appendChild(creaScheda(evento, sediPerId));
+        });
+
+        griglia.appendChild(schede);
+        stato.textContent = "";
+      } catch (errore) {
+        console.error("Errore nel caricamento dei dati:", errore);
+        stato.textContent =
+          "Non è stato possibile caricare gli eventi. Controlla che i file JSON siano presenti e validi.";
+      }
+    }
+
+    caricaEventi();
+  </script>
 </body>
 </html>

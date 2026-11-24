@@ -252,7 +252,7 @@ h3 {
   min-width: 0;
   overflow: hidden;
   border: 1px solid #b7c0b7;
-  border-radius: 0.rem;
+  border-radius: 0;
   background: #ffffff;
 }
 
@@ -310,7 +310,7 @@ h3 {
 }
 
 .venue-swiper figcaption {
-  padding: rem 0;
+  padding: 1rem 0;
 }
 
 .venue-controls {
