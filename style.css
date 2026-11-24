@@ -365,4 +365,35 @@ h3 {
   color: #000000;
   outline: 2px solid var(--colore-primario);
 }
+
+.weather-data {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.weather-data div {
+  padding: 1rem;
+  border: 2px solid #000000;
+  background: #ffffff;
+}
+
+.weather-data dt {
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+.weather-data dd {
+  margin: 0.5rem 0 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.weather-note,
+.weather-source {
+  max-width: 65ch;
+  font-size: 0.875rem;
+}
+
 /* Qui aggiungeremo la media query durante la demo. */

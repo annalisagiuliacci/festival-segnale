@@ -155,6 +155,36 @@
   </ul>
 </section>
 
+<section class="content-section weather-section" aria-labelledby="titolo-meteo">
+  <p class="eyebrow">Torino</p>
+  <h2 id="titolo-meteo">Meteo a Torino adesso</h2>
+
+  <p id="meteo-stato" role="status" aria-live="polite">Caricamento del meteo…</p>
+
+  <dl id="meteo-dati" class="weather-data" hidden>
+    <div>
+      <dt>Temperatura</dt>
+      <dd><span id="meteo-temperatura"></span></dd>
+    </div>
+    <div>
+      <dt>Vento</dt>
+      <dd><span id="meteo-vento"></span></dd>
+    </div>
+    <div>
+      <dt>Ora del dato</dt>
+      <dd><time id="meteo-ora"></time> (ora di Torino)</dd>
+    </div>
+  </dl>
+
+  <p class="weather-note">
+    Dati attuali: il meteo mostrato è quello di oggi e non è una previsione per le date del festival.
+  </p>
+  <p class="weather-source">
+    Dati meteo:
+    <a href="https://open-meteo.com/">Open-Meteo</a>,
+    licenza <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+  </p>
+</section>
 
     <section class="content-section" aria-labelledby="titolo-organizzazione">
       <p class="eyebrow">Prima di partire</p>
@@ -173,5 +203,60 @@
       <p>Segnale · Progetto didattico · Festival immaginario</p>
     </div>
   </footer>
+
+  <script>
+  const meteoStato = document.getElementById("meteo-stato");
+  const meteoDati = document.getElementById("meteo-dati");
+
+  async function caricaMeteo() {
+    const url = "https://api.open-meteo.com/v1/forecast"
+      + "?latitude=45.0703"
+      + "&longitude=7.6869"
+      + "&current=temperature_2m,wind_speed_10m"
+      + "&timezone=Europe%2FRome";
+
+    try {
+      const risposta = await fetch(url);
+
+      if (!risposta.ok) {
+        throw new Error(`Richiesta meteo non riuscita: ${risposta.status}`);
+      }
+
+      const dati = await risposta.json();
+      const attuali = dati.current;
+      const unita = dati.current_units;
+
+      if (
+        !attuali ||
+        attuali.temperature_2m == null ||
+        attuali.wind_speed_10m == null ||
+        !attuali.time
+      ) {
+        throw new Error("La risposta non contiene tutti i dati meteo richiesti.");
+      }
+
+      document.getElementById("meteo-temperatura").textContent =
+        `${attuali.temperature_2m} ${unita.temperature_2m}`;
+
+      document.getElementById("meteo-vento").textContent =
+        `${attuali.wind_speed_10m} ${unita.wind_speed_10m}`;
+
+      const ora = attuali.time.slice(11, 16);
+      const elementoOra = document.getElementById("meteo-ora");
+      elementoOra.dateTime = attuali.time;
+      elementoOra.textContent = ora;
+
+      meteoDati.hidden = false;
+      meteoStato.textContent = "";
+    } catch (errore) {
+      console.error("Errore nel caricamento del meteo:", errore);
+      meteoStato.textContent =
+        "Al momento il meteo non è disponibile. Le altre informazioni della pagina restano consultabili.";
+    }
+  }
+
+  caricaMeteo();
+</script>
+
 </body>
 </html>
