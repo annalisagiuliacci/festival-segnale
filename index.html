@@ -49,8 +49,181 @@
       </ul>
       <p class="reading-text">Festival, sedi ed eventi sono inventati per questa esercitazione. Non rappresentano un evento reale.</p>
     </section>
+
+    <section class="content-section news-section" aria-labelledby="titolo-notizie">
+  <p class="eyebrow">Torino</p>
+  <h2 id="titolo-notizie">Notizie da Torino</h2>
+
+  <p id="notizie-stato" role="status" aria-live="polite">
+    Caricamento delle notizie…
+  </p>
+
+  <ul id="notizie-lista" class="news-list"></ul>
+
+  <p class="news-source">
+    Notizie dal feed RSS di ANSA Piemonte. I contenuti appartengono ad ANSA.
+  </p>
+</section>
+
   </main>
 
   <footer class="site-footer"><div class="container"><p>Segnale · Progetto didattico · Festival immaginario</p></div></footer>
+
+  <script>
+  const URL_NOTIZIE =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7KAhxtQY8amzNyHQd3RuskT0dwSj5pdnrR-UVHM6CPzX0sox7lUv5kT34DYatCAbSHhO8n7kcyigN/pub?gid=365522260&single=true&output=csv";
+
+  const notizieStato = document.getElementById("notizie-stato");
+  const notizieLista = document.getElementById("notizie-lista");
+
+  function parseCSV(testo) {
+    const righe = [];
+    let riga = [];
+    let campo = "";
+    let traVirgolette = false;
+
+    for (let i = 0; i < testo.length; i++) {
+      const carattere = testo[i];
+
+      if (traVirgolette) {
+        if (carattere === '"' && testo[i + 1] === '"') {
+          campo += '"';
+          i++;
+        } else if (carattere === '"') {
+          traVirgolette = false;
+        } else {
+          campo += carattere;
+        }
+      } else if (carattere === '"') {
+        traVirgolette = true;
+      } else if (carattere === ",") {
+        riga.push(campo);
+        campo = "";
+      } else if (carattere === "\n") {
+        riga.push(campo);
+        righe.push(riga);
+        riga = [];
+        campo = "";
+      } else if (carattere !== "\r") {
+        campo += carattere;
+      }
+    }
+
+    if (campo.length > 0 || riga.length > 0) {
+      riga.push(campo);
+      righe.push(riga);
+    }
+
+    if (righe.length === 0) return [];
+
+    const intestazioni = righe.shift().map((nome, indice) =>
+      (indice === 0 ? nome.replace(/^\uFEFF/, "") : nome).trim().toLowerCase()
+    );
+
+    return righe
+      .filter((valori) => valori.some((valore) => valore.trim() !== ""))
+      .map((valori) =>
+        Object.fromEntries(
+          intestazioni.map((nome, indice) => [
+            nome,
+            (valori[indice] ?? "").trim()
+          ])
+        )
+      );
+  }
+
+  function scegliCampo(riga, nomi) {
+    for (const nome of nomi) {
+      if (riga[nome]) return riga[nome];
+    }
+    return "";
+  }
+
+  function formattaDataIt(valore) {
+    const dataItaliana = valore.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    let data;
+
+    if (dataItaliana) {
+      data = new Date(
+        Number(dataItaliana[3]),
+        Number(dataItaliana[2]) - 1,
+        Number(dataItaliana[1])
+      );
+    } else if (/^\d{4}-\d{2}-\d{2}$/.test(valore)) {
+      const [anno, mese, giorno] = valore.split("-").map(Number);
+      data = new Date(anno, mese - 1, giorno);
+    } else {
+      data = new Date(valore);
+    }
+
+    if (Number.isNaN(data.getTime())) return valore;
+
+    return new Intl.DateTimeFormat("it-IT", {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }).format(data);
+  }
+
+  async function caricaNotizie() {
+    try {
+      const risposta = await fetch(URL_NOTIZIE);
+
+      if (!risposta.ok) {
+        throw new Error(`Richiesta CSV non riuscita: ${risposta.status}`);
+      }
+
+      const testoCSV = await risposta.text();
+      const righe = parseCSV(testoCSV);
+
+      const notizie = righe
+        .map((riga) => ({
+          data: scegliCampo(riga, ["data", "date", "pubdate", "published"]),
+          titolo: scegliCampo(riga, ["titolo", "title"]),
+          link: scegliCampo(riga, ["link", "url"])
+        }))
+        .filter((notizia) => notizia.data && notizia.titolo && notizia.link)
+        .slice(0, 5);
+
+      if (notizie.length === 0) {
+        notizieStato.textContent = "Non ci sono notizie da mostrare.";
+        return;
+      }
+
+      for (const notizia of notizie) {
+        const url = new URL(notizia.link);
+
+        if (!["http:", "https:"].includes(url.protocol)) continue;
+
+        const elemento = document.createElement("li");
+        const data = document.createElement("time");
+        data.textContent = formattaDataIt(notizia.data);
+
+        const collegamento = document.createElement("a");
+        collegamento.href = url.href;
+        collegamento.textContent = notizia.titolo;
+        collegamento.target = "_blank";
+        collegamento.rel = "noopener noreferrer";
+
+        elemento.append(data, collegamento);
+        notizieLista.appendChild(elemento);
+      }
+
+      if (notizieLista.children.length === 0) {
+        notizieStato.textContent = "Non ci sono notizie da mostrare.";
+        return;
+      }
+
+      notizieStato.textContent = "";
+    } catch (errore) {
+      console.error("Errore nel caricamento delle notizie:", errore);
+      notizieStato.textContent =
+        "Al momento le notizie non sono disponibili. Il resto della pagina resta consultabile.";
+    }
+  }
+
+  caricaNotizie();
+</script>
+
 </body>
 </html>

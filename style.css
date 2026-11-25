@@ -395,5 +395,34 @@ h3 {
   max-width: 65ch;
   font-size: 0.875rem;
 }
+.news-list {
+  max-width: 65ch;
+  margin: 1.5rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.news-list li {
+  padding: 1rem 0;
+  border-top: 1px solid #b7c0b7;
+}
+
+.news-list time {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: #000000;
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+.news-list a {
+  font-weight: bold;
+}
+
+.news-source {
+  max-width: 65ch;
+  font-size: 0.875rem;
+}
+
 
 /* Qui aggiungeremo la media query durante la demo. */
