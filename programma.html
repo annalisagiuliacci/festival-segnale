@@ -46,106 +46,191 @@
     </div>
   </footer>
   <script>
-    const stato = document.getElementById("eventi-stato");
-    const griglia = document.getElementById("event-grid");
+  const stato = document.getElementById("eventi-stato");
+  const griglia = document.getElementById("event-grid");
 
-    function formattaData(dataISO) {
-      const [anno, mese, giorno] = dataISO.split("-").map(Number);
-      const data = new Date(anno, mese - 1, giorno);
-      const testo = new Intl.DateTimeFormat("it-IT", {
-        weekday: "long",
-        day: "numeric",
-        month: "long"
-      }).format(data);
+  const URL_EVENTI =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7KAhxtQY8amzNyHQd3RuskT0dwSj5pdnrR-UVHM6CPzX0sox7lUv5kT34DYatCAbSHhO8n7kcyigN/pub?gid=715787571&single=true&output=csv";
 
-      return testo.charAt(0).toUpperCase() + testo.slice(1);
-    }
+  const URL_SEDI =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7KAhxtQY8amzNyHQd3RuskT0dwSj5pdnrR-UVHM6CPzX0sox7lUv5kT34DYatCAbSHhO8n7kcyigN/pub?gid=546694404&single=true&output=csv";
 
-    function creaScheda(evento, sediPerId) {
-      const articolo = document.createElement("article");
-      articolo.className = "event-card";
+  function parseCSV(testo) {
+    const righe = [];
+    let riga = [];
+    let campo = "";
+    let traVirgolette = false;
 
-      const immagine = document.createElement("img");
-      immagine.src = evento.immagine;
-      immagine.alt = evento.immagine_alt;
-      immagine.width = 900;
-      immagine.height = 600;
-      articolo.appendChild(immagine);
+    for (let i = 0; i < testo.length; i++) {
+      const carattere = testo[i];
 
-      const corpo = document.createElement("div");
-      corpo.className = "event-body";
-
-      const meta = document.createElement("p");
-      meta.className = "event-meta";
-      meta.textContent =
-        `${formattaData(evento.data)} · ${evento.orario} · ${evento.categoria}`;
-
-      const titolo = document.createElement("h3");
-      titolo.textContent = evento.titolo;
-
-      const descrizione = document.createElement("p");
-      descrizione.textContent = evento.descrizione;
-
-      const rigaSede = document.createElement("p");
-      rigaSede.className = "event-place";
-
-      const etichettaSede = document.createElement("strong");
-      etichettaSede.textContent = "Sede: ";
-
-      const sede = sediPerId.get(evento.sede_id);
-      const nomeSede = document.createTextNode(
-        sede ? sede.nome : "Sede da definire"
-      );
-
-      rigaSede.append(etichettaSede, nomeSede);
-      corpo.append(meta, titolo, descrizione, rigaSede);
-      articolo.appendChild(corpo);
-
-      return articolo;
-    }
-
-    async function caricaEventi() {
-      try {
-        const [rispostaEventi, rispostaSedi] = await Promise.all([
-          fetch("eventi.json"),
-          fetch("sedi.json")
-        ]);
-
-        if (!rispostaEventi.ok || !rispostaSedi.ok) {
-          throw new Error("Non è stato possibile leggere uno o più file JSON.");
+      if (traVirgolette) {
+        if (carattere === '"' && testo[i + 1] === '"') {
+          campo += '"';
+          i++;
+        } else if (carattere === '"') {
+          traVirgolette = false;
+        } else {
+          campo += carattere;
         }
-
-        const [eventi, sedi] = await Promise.all([
-          rispostaEventi.json(),
-          rispostaSedi.json()
-        ]);
-
-        if (!Array.isArray(eventi) || !Array.isArray(sedi)) {
-          throw new Error("Il formato dei file JSON non è valido.");
-        }
-
-        if (eventi.length === 0) {
-          stato.textContent = "Non ci sono eventi da mostrare.";
-          return;
-        }
-
-        const sediPerId = new Map(sedi.map((sede) => [sede.id, sede]));
-        const schede = document.createDocumentFragment();
-
-        eventi.forEach((evento) => {
-          schede.appendChild(creaScheda(evento, sediPerId));
-        });
-
-        griglia.appendChild(schede);
-        stato.textContent = "";
-      } catch (errore) {
-        console.error("Errore nel caricamento dei dati:", errore);
-        stato.textContent =
-          "Non è possibile caricare gli eventi.";
+      } else if (carattere === '"') {
+        traVirgolette = true;
+      } else if (carattere === ",") {
+        riga.push(campo);
+        campo = "";
+      } else if (carattere === "\n") {
+        riga.push(campo);
+        righe.push(riga);
+        riga = [];
+        campo = "";
+      } else if (carattere !== "\r") {
+        campo += carattere;
       }
     }
 
-    caricaEventi();
-  </script>
+    if (campo.length > 0 || riga.length > 0) {
+      riga.push(campo);
+      righe.push(riga);
+    }
+
+    if (righe.length === 0) return [];
+
+    const intestazioni = righe.shift().map((nome, indice) =>
+      indice === 0 ? nome.replace(/^\uFEFF/, "").trim() : nome.trim()
+    );
+
+    return righe
+      .filter((valori) => valori.some((valore) => valore.trim() !== ""))
+      .map((valori) =>
+        Object.fromEntries(
+          intestazioni.map((intestazione, indice) => [
+            intestazione,
+            (valori[indice] ?? "").trim()
+          ])
+        )
+      );
+  }
+
+  function formattaData(dataISO) {
+    const [anno, mese, giorno] = dataISO.split("-").map(Number);
+    const data = new Date(anno, mese - 1, giorno);
+    const testo = new Intl.DateTimeFormat("it-IT", {
+      weekday: "long",
+      day: "numeric",
+      month: "long"
+    }).format(data);
+
+    return testo.charAt(0).toUpperCase() + testo.slice(1);
+  }
+
+  function creaScheda(evento, sediPerId) {
+    const articolo = document.createElement("article");
+    articolo.className = "event-card";
+
+    const immagine = document.createElement("img");
+    immagine.src = evento.immagine;
+    immagine.alt = evento.immagine_alt;
+    immagine.width = 900;
+    immagine.height = 600;
+    articolo.appendChild(immagine);
+
+    const corpo = document.createElement("div");
+    corpo.className = "event-body";
+
+    const meta = document.createElement("p");
+    meta.className = "event-meta";
+    meta.textContent =
+      `${formattaData(evento.data)} · ${evento.orario} · ${evento.categoria}`;
+
+    const titolo = document.createElement("h3");
+    titolo.textContent = evento.titolo;
+
+    const descrizione = document.createElement("p");
+    descrizione.textContent = evento.descrizione;
+
+    const rigaSede = document.createElement("p");
+    rigaSede.className = "event-place";
+
+    const etichettaSede = document.createElement("strong");
+    etichettaSede.textContent = "Sede: ";
+
+    const sede = sediPerId.get(evento.sede_id);
+    rigaSede.append(
+      etichettaSede,
+      document.createTextNode(sede ? sede.nome : "Sede da definire")
+    );
+
+    corpo.append(meta, titolo, descrizione, rigaSede);
+    articolo.appendChild(corpo);
+
+    return articolo;
+  }
+
+  async function caricaEventi() {
+    try {
+      const [rispostaEventi, rispostaSedi] = await Promise.all([
+        fetch(URL_EVENTI),
+        fetch(URL_SEDI)
+      ]);
+
+      if (!rispostaEventi.ok || !rispostaSedi.ok) {
+        throw new Error("Uno o più fogli CSV non sono raggiungibili.");
+      }
+
+      const [testoEventi, testoSedi] = await Promise.all([
+        rispostaEventi.text(),
+        rispostaSedi.text()
+      ]);
+
+      const eventiCSV = parseCSV(testoEventi);
+      const sediCSV = parseCSV(testoSedi);
+
+      const campiEvento = [
+        "id", "titolo", "data", "orario", "categoria",
+        "descrizione", "immagine", "immagine_alt", "sede_id"
+      ];
+      const campiSede = ["id", "nome", "indirizzo"];
+
+      if (
+        !eventiCSV.length ||
+        !campiEvento.every((campo) => campo in eventiCSV[0]) ||
+        !sediCSV.length ||
+        !campiSede.every((campo) => campo in sediCSV[0])
+      ) {
+        throw new Error("Le intestazioni dei CSV non corrispondono a quelle attese.");
+      }
+
+      const eventi = eventiCSV.map((evento) => ({
+        ...evento,
+        id: Number(evento.id),
+        sede_id: Number(evento.sede_id)
+      }));
+
+      const sediPerId = new Map(
+        sediCSV.map((sede) => [Number(sede.id), sede])
+      );
+
+      if (eventi.length === 0) {
+        stato.textContent = "Non ci sono eventi da mostrare.";
+        return;
+      }
+
+      const schede = document.createDocumentFragment();
+      eventi.forEach((evento) => {
+        schede.appendChild(creaScheda(evento, sediPerId));
+      });
+
+      griglia.appendChild(schede);
+      stato.textContent = "";
+    } catch (errore) {
+      console.error("Errore nel caricamento dei CSV:", errore);
+      stato.textContent =
+        "Non è stato possibile caricare gli eventi.";
+    }
+  }
+
+  caricaEventi();
+</script>
+
 </body>
 </html>
